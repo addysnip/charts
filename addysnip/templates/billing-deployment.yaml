@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: billing.addysnip
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: billing.addysnip
+    spec:
+      containers:
+      - command:
+        - /app/app
+        - -v
+        - consumer
+        env:
+        - name: GRPC_GO_LOG_VERBOSITY_LEVEL
+          value: {{ default "0" .Values.billing.grpc.log.verbosity }}
+        - name: GRPC_GO_LOG_SEVERITY_LEVEL
+          value: {{ default "error" .Values.billing.grpc.log.severity }}
+        envFrom:
+        - secretRef:
+            name: billing
+            optional: false
+        - secretRef:
+            name: database
+            optional: false
+        - secretRef:
+            name: rabbitmq
+            optional: false
+        {{- with .Values.billing.image }}
+        image: "{{- if .repository -}}{{ .repository }}{ else }}{{ .registry }}/{{ .image }}{{- end -}}:{{ .tag }}{{- if (.digest) -}}@{{ .digest }}{{- end -}}"
+        {{- end }}
+        imagePullPolicy: Always
+        name: billing
+        ports:
+        - containerPort: 5000
+          name: 5000tcp
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecrets.name }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

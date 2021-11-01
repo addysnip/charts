@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: addysnip-api
+  namespace: {{ .Release.Namespace }}
+spec:
+  rules:
+  - host: {{ .Values.api.appUrl }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: addysnip-api
+            port:
+              number: 3000
+        path: /
+        pathType: prefix
+  tls:
+  - hosts:
+    - {{ .Values.api.appUrl }}
+    secretName: {{ .Values.tls.secretName }}

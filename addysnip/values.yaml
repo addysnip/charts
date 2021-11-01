@@ -1,0 +1,73 @@
+imagePullSecrets:
+  dockerconfigjson: "{}"
+  name: "gar-json-config"
+
+config:
+  database:
+    caCert: "cert"
+    dsn: "root:secret12345@tcp(db:3306)/db"
+  rabbitmq:
+    host: "rabbitmq.rabbitmq.svc.cluster.local"
+    port: 5672
+    user: guest
+    password: guest
+  redis:
+    host: "redis"
+    port: 6379
+    password: password
+    sentinel:
+      enabled: 1
+      addr: "sentinel.redis.svc.cluster.local:5000"
+  smtp:
+    host: "mail.addysnip.com"
+    port: 587
+    user: no-reply@addysnip.com
+    password: password
+
+tls:
+  secretName: tls-addysnip-com
+
+api:
+  image:
+    registry: "us.gcr.io"
+    image: "addysnip/api"
+    tag: "94efa7b3"
+  grpc:
+    log:
+      verbosity: 99
+      severity: info
+    billing:
+      caCert: cert
+      addr: "billing:5000"
+      token: secret12345
+  sessionSecret: secret12345
+  jwtSecret: secret12345
+  appUrl: api.addysnip.com
+
+billing:
+  image:
+    registry: "us.gcr.io"
+    image: "addysnip/billing"
+    tag: "254cb326"
+  appUrl: "https://dashboard.addysnip.com"
+  grpc:
+    log:
+      verbosity: 99
+      severity: info
+    cert: cert
+    key: key
+    port: 5000
+    token: secret12345
+  stripe:
+    key: sk_test-u23895yru897y2q8794trfyh897iqw3hw3789ifh8973whyg
+  rabbitmq:
+    queue: billing
+
+emailer:
+  image:
+    registry: us.gcr.io
+    image: addysnip/emailer
+    tag: 956f19f1
+  rabbitmq:
+    queue: emailer-dev
+  

@@ -1,0 +1,11 @@
+apiVersion: v2
+name: addysnip
+version: 0.0.99+1
+appVersion: 0.0.99
+home: https://github.com/addysnip
+sources:
+- https://github.com/addysnip/helm
+type: application
+maintainers:
+  - name: Daniel A. Hawton
+kubeVersion: ">=1.19.0-0"
